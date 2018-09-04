@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+	
+<struts>
+	<constant name="struts.devMode" value="false" />
+
+	<package name="basicsruts2" extends="struts-default">
+		
+		<interceptors>
+			<interceptor name="loginInterceptor" class="com.bigguy.bos.web.intreceptor.LoginInterceptor">
+				<param name="excludeMethods" >login</param>
+			</interceptor>
+		
+			<interceptor-stack name="myStack">
+				<interceptor-ref name="loginInterceptor"></interceptor-ref>
+				<interceptor-ref name="defaultStack"></interceptor-ref>
+			</interceptor-stack>
+		
+		</interceptors>
+	
+		<!-- 配置默认的拦截器栈 -->
+		<default-interceptor-ref name="myStack"></default-interceptor-ref>
+		
+		<!-- 配置全局结果视图  -->
+		<global-results>
+			<result name="login">/login.jsp</result>
+		</global-results>
+	
+		<action name="userAction_*" class="com.bigguy.bos.web.action.base.UserAction" method="{1}" >
+			
+			<result name="home">/index.jsp</result>
+		</action>
+	
+		<!-- 进行权限控制页面访问 -->
+		<action name="page_*_*">		<!-- 这里的 action 的 class 和  method 忽略了 ,则默认调用的是 ActionSupport 和 execute 方法，返回 SUCCESS -->
+			<result type="dispatcher">/WEB-INF/pages/{1}/{2}.jsp</result>
+		</action>
+		
+		<action name="staffAction_*" class="com.bigguy.bos.web.action.base.StaffAction" method="{1}">
+			<result name="list">/WEB-INF/pages/base/staff.jsp</result>
+		</action>
+		
+		<action name="regionAction_*" class="com.bigguy.bos.web.action.base.RegionAction" method="{1}">
+			<result name="regionList">/WEB-INF/pages/base/region.jsp</result>
+		</action>
+		
+		
+		<action name="subareaAction_*" class="com.bigguy.bos.web.action.SubareaAction" method="{1}">
+			<result name="subareaList">/WEB-INF/pages/base/subarea.jsp</result>
+		</action>
+		
+		<action name="decidedzoneAction_*" class="com.bigguy.bos.web.action.DecidedzoneAction" method="{1}">
+			<result name="list">/WEB-INF/pages/base/decidedzone.jsp</result>
+		</action>
+		
+		<action name="publicAction_*" class="com.bigguy.bos.web.action.PublicAction" method="{1}">
+			
+		</action>
+		
+	</package>
+
+</struts>

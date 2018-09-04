@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xsi:schemaLocation="http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+
+	<!-- 配置数据库源 -->
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+
+	<!-- 配置c3p0 数据源 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${jdbc.driverClass}" ></property>
+		<property name="jdbcUrl"  value="${jdbc.url}"></property>
+		<property name="user"  value="${jdbc.user}"></property>
+		<property name="password"  value="${jdbc.password}"></property>
+	</bean>
+
+	<!-- Spring 提供整合hibernate 的工厂bean -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.hbm2ddl">update</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+			</props>
+		</property>
+		
+		<!-- 注入 hibenrate 的映射文件 -->
+		<property name="mappingLocations">
+			<list>
+				<value>classpath:com/bigguy/bos/domain/*.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+
+	<!-- 配置事务管理器 -->
+	
+	<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<!-- 开启注解扫描 -->
+	<context:component-scan base-package="com.bigguy.bos"></context:component-scan>
+	
+	<!-- 事务注解  -->
+	<tx:annotation-driven/>
+	
+	<!-- 声明 服务端bean -->
+	<jaxws:client id="crmClient" serviceClass="com.bigguy.ws.customer.ICustomerService" 
+	 	address="http://127.0.0.1:8080/WebServiceDemo/ws/customer"   >
+	
+	</jaxws:client>
+		
+	
+	
+
+
+</beans>
